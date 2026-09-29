@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>URL Shortener</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            width: 600px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            margin-top: 30px;
+        }
+
+        p {
+            color: #666;
+        }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 20px 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background-color: #333;
+            color: white;
+            margin: 5px;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        #shortUrl {
+            display: block;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+
+        .history-item {
+            text-align: left;
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+        }
+
+        .history-item p {
+            margin: 8px 0;
+        }
+
+        .history-item a {
+            word-break: break-all;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 25px 0;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>URL Shortener</h1>
+
+        <p>Enter a long URL and make it shorter.</p>
+
+
+        <!-- Error message -->
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+
+        <!-- URL form -->
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <input
+                type="url"
+                name="original_url"
+                placeholder="Enter your URL"
+                required
+            >
+
+            <button type="submit">
+                Shorten URL
+            </button>
+
+        </form>
+
+
+        <!-- Newly created short URL -->
+
+        {% if short_url %}
+
+            <hr>
+
+            <h2>Your shortened URL</h2>
+
+            <a
+                href="{{ short_url }}"
+                target="_blank"
+                id="shortUrl"
+            >
+                {{ short_url }}
+            </a>
+
+            <button onclick="copyURL()">
+                📋 Copy URL
+            </button>
+
+            <p>
+                <strong>Clicks:</strong> {{ clicks }}
+            </p>
+
+        {% endif %}
+
+
+        <!-- URL History -->
+
+        <hr>
+
+        <h2>URL History</h2>
+
+        {% if urls %}
+
+            {% for item in urls %}
+
+                <div class="history-item">
+
+                    <p>
+                        <strong>Original URL:</strong><br>
+                        {{ item.original_url }}
+                    </p>
+
+                    <p>
+                        <strong>Short URL:</strong><br>
+
+                        <a
+                            href="/{{ item.short_code }}/"
+                            target="_blank"
+                        >
+                            http://127.0.0.1:8000/{{ item.short_code }}/
+                        </a>
+                    </p>
+
+                    <p>
+                        <strong>Clicks:</strong>
+                        {{ item.clicks }}
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>No URLs created yet.</p>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- Copy URL JavaScript -->
+
+    <script>
+        function copyURL() {
+
+            const url = document.getElementById("shortUrl").textContent.trim();
+
+            navigator.clipboard.writeText(url);
+
+            alert("URL copied!");
+        }
+    </script>
+
+</body>
+</html>
